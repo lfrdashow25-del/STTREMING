@@ -20,8 +20,8 @@ jobs:
           STREAM_URL="https://w1.webcamromania.ro/sboppaltinis2/tracks-v1a1/mono.m3u8"
 
           while true; do
-            # تم حذف الروابط الخارجية تماماً واستبدالها بملف storm.mp3 المحلي
-            ffmpeg -re -i "$STREAM_URL" -stream_loop -1 -i "storm.mp3" \
+            # تم حذف الروابط الخارجية تماماً واستبدالها بملف storm.mp3.mp3 المحلي
+            ffmpeg -re -i "$STREAM_URL" -stream_loop -1 -i "storm.mp3.mp3" \
             -filter_complex "[0:v]scale=1280:720,drawbox=y=0:w=iw:h=60:color=black@0.8:t=fill[v1]; \
                              [v1]drawtext=text='%{localtime\:%Y-%m-%d  %H\\:%M\\:%S}':x=30:y=15:fontsize=32:fontcolor=white[v_final]; \
                              [1:a]volume=0.7[a_storm]" \
