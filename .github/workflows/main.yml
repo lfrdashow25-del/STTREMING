@@ -1,4 +1,4 @@
-name: 24/7 Professional Nature Stream with Storm Audio
+name: 24/7 Professional Nature Stream
 
 on:
   schedule:
@@ -14,18 +14,28 @@ jobs:
 
       - name: Start Streaming
         run: |
-          # رابط الكاميرا
+          # رابط الكاميرا الخاص بك
           STREAM_URL="https://w1.webcamromania.ro/sboppaltinis2/tracks-v1a1/mono.m3u8"
-          # رابط صوت العاصفة الثلجية (رابط مباشر لصوت نقي)
-          STORM_AUDIO="https://www.soundjay.com/nature/sounds/wind-chime-01.mp3"
+          
+          # رابط صوت عاصفة بديل ومباشر
+          STORM_AUDIO="https://cdn.pixabay.com/audio/2022/11/22/audio_feb639191e.mp3"
 
           while true; do
+            # محاولة البث مع دمج الصوت
             ffmpeg -re -i "$STREAM_URL" -stream_loop -1 -i "$STORM_AUDIO" \
             -filter_complex "[0:v]drawbox=y=0:w=iw:h=45:color=black@1:t=fill, 
                              drawtext=text='%{localtime\:%Y-%m-%d  %H\\:%M\\:%S}':x=w-350:y=h-60:fontsize=35:fontcolor=white:box=1:boxcolor=black@0.6[v];
                              [1:a]volume=0.4[a1];[0:a][a1]amix=inputs=2:duration=first[a]" \
             -map "[v]" -map "[a]" \
             -c:v libx264 -preset veryfast -b:v 2500k -c:a aac -b:a 128k \
-            -f flv "rtmp://a.rtmp.youtube.com/live2/${{ secrets.YOUTUBE_STREAM_KEY }}" \
-            || sleep 10
+            -f flv "rtmp://a.rtmp.youtube.com/live2/${{ secrets.YOUTUBE_STREAM_KEY }}" || \
+            
+            # إذا فشل الصوت (مثلما حدث معك)، سيعمل هذا الجزء فوراً لبث الفيديو وحده لضمان استمرار البث
+            ffmpeg -re -i "$STREAM_URL" \
+            -vf "drawbox=y=0:w=iw:h=45:color=black@1:t=fill, 
+                 drawtext=text='%{localtime\:%Y-%m-%d  %H\\:%M\\:%S}':x=w-350:y=h-60:fontsize=35:fontcolor=white:box=1:boxcolor=black@0.6" \
+            -c:v libx264 -preset veryfast -b:v 2500k -c:a aac -b:a 128k \
+            -f flv "rtmp://a.rtmp.youtube.com/live2/${{ secrets.YOUTUBE_STREAM_KEY }}"
+            
+            sleep 10
           done
