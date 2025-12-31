@@ -20,11 +20,11 @@ jobs:
           STREAM_URL="https://w1.webcamromania.ro/sboppaltinis2/tracks-v1a1/mono.m3u8"
 
           while true; do
-            # تم رفع سمك الشريط الأسود (h=80) ليغطي مساحة أكبر في الأعلى
-            # الساعة الآن باللون الأبيض داخل هذا الشريط
+            # تم استخدام color=black (بدون @) لضمان سواد داكن 100% غير شفاف
+            # تم ضبط إحداثيات الساعة لتكون واضحة وكبيرة في أعلى اليسار
             ffmpeg -re -i "$STREAM_URL" -stream_loop -1 -i "storm.mp3" \
-            -filter_complex "[0:v]scale=1280:720,drawbox=y=0:w=iw:h=80:color=black@1:t=fill[v1]; \
-                             [v1]drawtext=text='%{localtime\:%Y-%m-%d  %H\\:%M\\:%S}':x=30:y=20:fontsize=35:fontcolor=white[v_final]; \
+            -filter_complex "[0:v]scale=1280:720,drawbox=y=0:w=iw:h=100:color=black:t=fill[v1]; \
+                             [v1]drawtext=text='LIVE  %{localtime\:%Y-%m-%d  %H\\:%M\\:%S}':x=40:y=25:fontsize=45:fontcolor=white:fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf[v_final]; \
                              [1:a]volume=0.8[a_storm]" \
             -map "[v_final]" -map "[a_storm]" \
             -c:v libx264 -preset veryfast -b:v 2500k -pix_fmt yuv420p \
